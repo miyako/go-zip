@@ -19,11 +19,11 @@ func TestSjis2Utf8(t *testing.T) {
 func TestUtf82Sjis(t *testing.T) {
 	// SJISで"GO言語"
 	word := string([]byte{0x47, 0x4f, 0x8c, 0xbe, 0x8c, 0xea})
-	sjis, err := Sjis2Utf8("GO言語")
+	sjis, err := Utf82Sjis("GO言語")
 	if err != nil {
 		t.Errorf("got error[%v]", err)
 	}
-	if utf8 != "GO言語" {
-		t.Errorf("sjis[%v] utf8[%v]", sjis, utf8)
+	if sjis != word {
+		t.Errorf("sjis[%v] word[%v]", sjis, word)
 	}
 }
