@@ -3,14 +3,15 @@ package zi18np
 import (
 	"archive/zip"
 	"fmt"
-	"golang.org/x/text/encoding/japanese"
-	"golang.org/x/text/transform"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 )
 
 func Sjis2Utf8(str string) (string, error) {
@@ -151,6 +152,11 @@ func Unzip(archive, target string) error {
 			continue
 		}
 
+		dir := filepath.Dir(utf)
+		if dir != "." && !Exists(dir) {
+			os.MkdirAll(dir, 0755)
+		}
+
 		fileReader, err := file.Open()
 		if err != nil {
 			return err
@@ -171,3 +177,9 @@ func Unzip(archive, target string) error {
 
 	return nil
 }
+
+func Exists(path string) bool {
+	_, err := os.Stat(path)
+		return !os.IsNotExist(err)
+}
+
