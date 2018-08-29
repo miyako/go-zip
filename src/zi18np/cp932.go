@@ -180,6 +180,5 @@ func Unzip(archive, target string) error {
 
 func Exists(path string) bool {
 	_, err := os.Stat(path)
-		return !os.IsNotExist(err)
+	return !os.IsNotExist(err)
 }
-
