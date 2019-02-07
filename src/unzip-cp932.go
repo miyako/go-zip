@@ -1,10 +1,10 @@
 package main
 
 import (
+	"./zi18np"
 	"fmt"
 	"os"
 	"path/filepath"
-	"zi18np"
 )
 
 func Exists(filename string) bool {

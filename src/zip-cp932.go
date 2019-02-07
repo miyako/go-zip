@@ -1,9 +1,9 @@
 package main
 
 import (
+	"./zi18np"
 	"fmt"
 	"os"
-	"zi18np"
 )
 
 func main() {

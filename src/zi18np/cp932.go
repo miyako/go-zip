@@ -121,8 +121,8 @@ func Zip(source, output string) error {
 		if err != nil {
 			return err
 		}
-		defer file.Close()
 		_, err = io.Copy(writer, file)
+		file.Close()
 		return err
 	})
 
@@ -130,51 +130,59 @@ func Zip(source, output string) error {
 }
 
 // Unzip file, and convert file name CP932 to UTF8
-func Unzip(archive, target string) error {
+func Unzip(archive, dest string) error {
 	reader, err := zip.OpenReader(archive)
 	if err != nil {
 		return err
 	}
 
-	if err := os.MkdirAll(target, 0755); err != nil {
+	if err := os.MkdirAll(dest, 0755); err != nil {
 		return err
 	}
 
 	for _, file := range reader.File {
-		path := filepath.Join(target, file.Name)
-		utf, err := Sjis2Utf8(path)
+		err := unzipFile(reader, file, dest)
 		if err != nil {
-			fmt.Println(err)
-			utf = path
-		}
-		if file.FileInfo().IsDir() {
-			os.MkdirAll(utf, file.Mode())
-			continue
-		}
-
-		dir := filepath.Dir(utf)
-		if dir != "." && !Exists(dir) {
-			os.MkdirAll(dir, 0755)
-		}
-
-		fileReader, err := file.Open()
-		if err != nil {
-			return err
-		}
-		defer fileReader.Close()
-
-		fmt.Println(utf)
-		targetFile, err := os.OpenFile(utf, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
-		if err != nil {
-			return err
-		}
-		defer targetFile.Close()
-
-		if _, err := io.Copy(targetFile, fileReader); err != nil {
 			return err
 		}
 	}
 
+	return nil
+}
+
+func unzipFile(reader *zip.ReadCloser, file *zip.File, dest string) error {
+	path := filepath.Join(dest, file.Name)
+	utf, err := Sjis2Utf8(path)
+	if err != nil {
+		fmt.Println(err)
+		utf = path
+	}
+	if file.FileInfo().IsDir() {
+		os.MkdirAll(utf, file.Mode())
+		return nil
+	}
+
+	dir := filepath.Dir(utf)
+	if dir != "." && !Exists(dir) {
+		os.MkdirAll(dir, 0755)
+	}
+
+	fileReader, err := file.Open()
+	if err != nil {
+		return err
+	}
+	defer fileReader.Close()
+
+	fmt.Println(utf)
+	targetFile, err := os.OpenFile(utf, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
+	if err != nil {
+		return err
+	}
+	defer targetFile.Close()
+
+	if _, err := io.Copy(targetFile, fileReader); err != nil {
+		return err
+	}
 	return nil
 }
 
