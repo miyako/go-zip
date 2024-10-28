@@ -71,7 +71,6 @@ func unzipFile(reader *zip.ReadCloser, file *zip.File, dest string, cp932 bool) 
 	}
 	defer fileReader.Close()
 
-	fmt.Println(path)
 	targetFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
 	if err != nil {
 		return err
